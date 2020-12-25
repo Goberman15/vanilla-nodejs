@@ -1,10 +1,25 @@
 const http = require('http');
+const https = require('https');
 const { URL } = require('url');
 const { StringDecoder } = require('string_decoder');
+const fs = require('fs');
 const config = require('./config.js');
 
-const server = http.createServer((req, res) => {
+// HTTP server
+const httpServer = http.createServer((req, res) => {
+    server(req, res);
+})
 
+// HTTPS server
+httpsOpts = {
+    key: fs.readFileSync('./https/key.pem'),
+    cert: fs.readFileSync('./https/cert.pem')
+}
+const httpsServer = https.createServer(httpsOpts, (req, res) => {
+    server(req,res);
+})
+
+const server = (req, res) => {
     // parse HTTP headers
     const headers = req.headers;
 
@@ -49,6 +64,10 @@ const server = http.createServer((req, res) => {
     // define handlers
     const routeHandler = {};
 
+    routeHandler.ping = (data, cb) => {
+        cb(200);
+    }
+
     routeHandler.test = (data, cb) => {
         cb(406, {test: 'test'});
     }
@@ -59,8 +78,10 @@ const server = http.createServer((req, res) => {
 
     // define routers
     const router = {
-        test: routeHandler.test
+        test: routeHandler.test,
+        ping: routeHandler.ping
     };
-})
+}
 
-server.listen(config.port, () => console.log(`Server is Running on port ${config.port} in ${config.envName} mode`));
+httpServer.listen(config.httpPort, () => console.log(`Server is Running on port ${config.httpPort} in ${config.envName} mode`));
+httpsServer.listen(config.httpsPort, () => console.log(`Server is Running on port ${config.httpsPort} in ${config.envName} mode`));

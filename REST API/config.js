@@ -7,12 +7,14 @@
  const environments = {};
 
  environments.development = {
-    port: 3000,
+    httpPort: 3000,
+    httpsPort: 3030,
     envName: 'development'
  }
 
  environments.production = {
-     port: 8000,
+     httpPort: 8000,
+     httpsPort: 8080,
      envName: 'production'
  }
 
