@@ -1,7 +1,7 @@
 const http = require('http');
 const { URL } = require('url');
 const { StringDecoder } = require('string_decoder');
-// const querystring = require('querystring');
+const config = require('./config.js');
 
 const server = http.createServer((req, res) => {
 
@@ -32,11 +32,35 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
         buffer += decoder.end();
 
-        console.log(buffer);
-        res.end('Well hello everybody');
+        const handler = router[trimmedPath] ? router[trimmedPath] : routeHandler.notFound;
+
+        let data = {};
+        
+        handler(data, (statusCode, payload) => {
+
+            const payloadStr = JSON.stringify(payload);
+
+            res.setHeader("Content-Type", "application/json");
+            res.writeHead(statusCode);
+            res.end(payloadStr);
+        })
     })
     
+    // define handlers
+    const routeHandler = {};
 
+    routeHandler.test = (data, cb) => {
+        cb(406, {test: 'test'});
+    }
+
+    routeHandler.notFound = (data, cb) => {
+        cb(404);
+    }
+
+    // define routers
+    const router = {
+        test: routeHandler.test
+    };
 })
 
-server.listen(3400, () => console.log("Server is Running!"));
+server.listen(config.port, () => console.log(`Server is Running on port ${config.port} in ${config.envName} mode`));
