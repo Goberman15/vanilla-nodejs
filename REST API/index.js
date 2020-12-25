@@ -4,6 +4,15 @@ const { URL } = require('url');
 const { StringDecoder } = require('string_decoder');
 const fs = require('fs');
 const config = require('./config.js');
+const _data = require('./lib/data.js');
+
+_data.create('', 'testFile', {name: 'Ujep'}, (err) => {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log('Success Write File')
+    }
+})
 
 // HTTP server
 const httpServer = http.createServer((req, res) => {
